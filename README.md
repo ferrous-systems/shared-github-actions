@@ -19,8 +19,14 @@ jobs:
       cname: subdomain.example.com
 ```
 
-You can also optionally configure the mdBook version and the path containing
-the sources:
+This will publish the book present in the root of the repository on the domain
+name you specified. A pinned mdBook version is used (see the workflow's [source
+code] to check which version is currently pinned).
+
+[source code]: https://github.com/ferrous-systems/shared-github-actions/blob/main/.github/workflows/mdbook-to-github-pages.yml
+
+You can optionally configure the mdBook version and the path containing the
+book:
 
 ```yaml
 jobs:
