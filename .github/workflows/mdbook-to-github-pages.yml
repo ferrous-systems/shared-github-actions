@@ -1,0 +1,48 @@
+---
+
+name: mdBook to GitHub Pages
+on:
+  workflow_call:
+    inputs:
+      cname:
+        type: string
+        required: true
+      path:
+        type: string
+        default: .
+      version:
+        type: string
+        default: 0.4.14
+
+jobs:
+  main:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Download mdBook ${{ inputs.version }}
+        run: |
+          mkdir -p /tmp/mdbook
+          curl -Lo- https://github.com/rust-lang/mdBook/releases/download/v${{ inputs.version }}/mdbook-v${{ inputs.version }}-x86_64-unknown-linux-gnu.tar.gz | tar -C /tmp/mdbook -xzv
+
+      - name: Build the contents of the book
+        run: /tmp/mdbook/mdbook build ${{ inputs.path }} -d /tmp/book
+
+      - name: Deploy to GitHub Pages
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+
+          cd /tmp/book
+
+          touch .nojekyll
+          echo ${{ inputs.cname }} > CNAME
+
+          git init .
+          git add .
+          git commit -m "deploy to github pages"
+          git branch -m gh-pages
+          git push --force https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} gh-pages
+        if: github.ref == 'refs/heads/main'
