@@ -32,6 +32,9 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: |
+          # Use `github-actions[bot]`'s actual email address and name to
+          # attribute the commit to it. The number in the email address is the
+          # bot's GitHub ID.
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
 
