@@ -5,6 +5,35 @@ we can use as part of our repositories. **This repository is internal, and
 every member of our GitHub Enterprise will have access to it, not only Ferrous
 Systems employees.**
 
+## Cache Rust
+
+An action is present in this repository to properly cache Rust build artifacts
+for any project using Rust. The cache is keyed by the compiler version, to
+avoid ever-growing caches when the compiler is bumped and the old artifacts are
+not removed. In practice, the action caches:
+
+* The Cargo registry cache, containing the `.crate` tarballs of all the crates
+  used by the project.
+* The Cargo index cache, containing the clone of the registry index repository.
+* The contents of the target directory, by default `target/`.
+
+You can use this action by adding this code to your workflow, before any
+compilation step happens:
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/cache-rust@main
+```
+
+If you're using a different target directory than `target/` you can specify it:
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/cache-rust@main
+    with:
+      target-dir: path/to/target/
+```
+
 ## mdBook to GitHub Pages
 
 A reusable workflow is present in this repository to automate publishing a
@@ -36,4 +65,16 @@ jobs:
       cname: subdomain.example.com
       version: 0.4.14
       path: docs/
+```
+
+If your book also uses a Rust preprocessor that requires compilation, you can
+cache the Rust compilation artifacts to greatly speed up the build process:
+
+```yaml
+jobs:
+  mdbook:
+    uses: ferrous-systems/shared-github-actions/.github/workflows/mdbook-to-github-pages.yml@main
+    with:
+      cname: subdomain.example.com
+      cache-target-directory: true
 ```
