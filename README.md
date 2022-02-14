@@ -34,6 +34,36 @@ steps:
       target-dir: path/to/target/
 ```
 
+## Authenticate with AWS
+
+An action is present in this repository to authenticate with an AWS account and
+assume an AWS IAM Role through OpenID Connect authentication. The role must
+have a trust relationship configured to allow GitHub Actions to assume it.
+Documentation on how to configure the trust relationship is available [on the
+GitHub documentation][github-aws-docs].
+
+You can use this action by adding this code to your workflow, before any
+step that requires AWS authentication:
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/aws-oidc@main
+    with:
+      role: arn:aws:iam::000000000000:role/my-role-name
+```
+
+You can also choose a different default region than `us-east-1`:
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/aws-oidc@main
+    with:
+      role: arn:aws:iam::000000000000:role/my-role-name
+      region: eu-central-1
+```
+
+[github-aws-docs]: https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+
 ## mdBook to GitHub Pages
 
 A reusable workflow is present in this repository to automate publishing a

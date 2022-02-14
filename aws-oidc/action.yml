@@ -1,0 +1,27 @@
+name: Authenticate with AWS
+description: Authenticate with AWS using OpenID Connect
+
+inputs:
+  role:
+    description: ARN of the role to assume
+  region:
+    description: AWS region to use by default
+    default: us-east-1
+
+runs:
+  using: composite
+  steps:
+    - name: Load AWS credentials into the environment
+      shell: bash
+      run: |
+        curl -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com" | jq -r '.value' > /tmp/awsjwt
+        chmod 0400 /tmp/awsjwt
+
+        echo "AWS_WEB_IDENTITY_TOKEN_FILE=/tmp/awsjwt" >> "${GITHUB_ENV}"
+        echo "AWS_ROLE_ARN=${{ inputs.role }}" >> "${GITHUB_ENV}"
+        echo "AWS_ROLE_SESSION_NAME=github-actions" >> "${GITHUB_ENV}"
+        echo "AWS_DEFAULT_REGION=${{ inputs.region }}" >> "${GITHUB_ENV}"
+
+    - name: Check whether the AWS credentials are valid
+      shell: bash
+      run: aws sts get-caller-identity
