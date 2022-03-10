@@ -1,9 +1,20 @@
 # Shared GitHub Actions workflows and actions
 
 This repository contains a collection of GitHub Actions workflows and actions
-we can use as part of our repositories. **This repository is internal, and
-every member of our GitHub Enterprise will have access to it, not only Ferrous
-Systems employees.**
+we can use in repositories managed by Ferrous Systems. Ferrous Systems
+employees should prefer to use actions defined in this repository to reduce the
+risk of supply-chain attacks.
+
+🚨 **The contents of this repository are strictly meant for internal use** 🚨.
+While this repository is public and released under an open source license,
+breaking changes will regularly happen, we will provide no support and
+third-party pull requests will not be accepted.
+
+If you intend to use the contents of this repository outside of Ferrous Systems
+we recommend forking.
+
+The contents of this repository are licensed under either the MIT license or
+the Apache-2.0 license, at your discretion.
 
 ## Cache Rust
 
