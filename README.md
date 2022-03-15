@@ -45,6 +45,32 @@ steps:
       target-dir: path/to/target/
 ```
 
+## Upload to GitHub Pages
+
+An action is present in this repository to upload the contents of a directory
+to GitHub Pages. The action requires the path that should be uploaded. It will
+disable Jekyll pre-processing, it will create a commit with the contents you
+want to upload and it will push it to the `gh-pages` branch:
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/github-pages@main
+    with:
+      path: build/site/
+      token: ${{ secrets.GITHUB_TOKEN }}
+```
+
+A domain name can be optionally specified:
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/github-pages@main
+    with:
+      path: build/site/
+      cname: subdomain.example.com
+      token: ${{ secrets.GITHUB_TOKEN }}
+```
+
 ## Authenticate with AWS
 
 An action is present in this repository to authenticate with an AWS account and
