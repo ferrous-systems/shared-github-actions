@@ -41,21 +41,9 @@ jobs:
           CARGO_TARGET_DIR: /tmp/target
 
       - name: Deploy to GitHub Pages
-        run: |
-          # Use `github-actions[bot]`'s actual email address and name to
-          # attribute the commit to it. The number in the email address is the
-          # bot's GitHub ID.
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "github-actions[bot]"
-
-          cd /tmp/book
-
-          touch .nojekyll
-          echo ${{ inputs.cname }} > CNAME
-
-          git init .
-          git add .
-          git commit -m "deploy to github pages"
-          git branch -m gh-pages
-          git push --force https://github-actions:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} gh-pages
+        uses: ferrous-systems/shared-github-actions/github-pages@main
+        with:
+          path: /tmp/book
+          cname: ${{ inputs.cname }}
+          token: ${{ secrets.GITHUB_TOKEN }}
         if: github.ref == 'refs/heads/main'

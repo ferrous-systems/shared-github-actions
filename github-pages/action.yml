@@ -1,0 +1,46 @@
+name: Upload to GitHub Pages
+description: Upload the contents of a directory to GitHub Pages
+
+inputs:
+  path:
+    type: string
+    description: Path of the directory to upload to GitHub Pages
+    required: true
+  cname:
+    type: string
+    default: ""
+  token:
+    type: string
+    description: GitHub token used to push the gh-pages branch
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Disable Jekyll preprocessing
+      run: touch "${{ inputs.path }}/.nojekyll"
+      shell: bash
+
+    - name: Set the CNAME
+      run: echo "${{ inputs.cname }}" >> "${{ inputs.path }}/CNAME"
+      shell: bash
+      if: inputs.cname != ''
+
+    - name: Upload to GitHub Pages
+      run: |
+        cd "${{ inputs.path }}"
+
+        rm -rf .git
+        git init .
+
+        # Use `github-actions[bot]`'s actual email address and name to
+        # attribute the commit to it. The number in the email address is the
+        # bot's GitHub ID.
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+
+        git add .
+        git commit -m "deploy to github pages"
+        git branch -m gh-pages
+        git push --force https://github-actions:${{ inputs.token }}@github.com/${{ github.repository }} gh-pages
+      shell: bash
