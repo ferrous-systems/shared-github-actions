@@ -45,6 +45,16 @@ steps:
       target-dir: path/to/target/
 ```
 
+If you're using the action in multiple jobs in the same repository, you should
+specify an unique cache key for each job:
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/cache-rust@main
+    with:
+      cache-key: job1
+```
+
 ## Upload to GitHub Pages
 
 An action is present in this repository to upload the contents of a directory

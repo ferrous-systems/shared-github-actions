@@ -5,6 +5,9 @@ inputs:
   target-dir:
     description: Path to the Cargo target directory
     default: target/
+  cache-key:
+    description: Cache key to distinguish this invocation from other uses of the action in the same repo
+    default: default
 
 runs:
   using: composite
@@ -18,22 +21,22 @@ runs:
       uses: actions/cache@v3
       with:
         path: ~/.cargo/registry/cache
-        key: cargo-registry-cache-${{ hashFiles('**/Cargo.lock') }}
+        key: cargo-registry-cache-${{ inputs.cache-key }}-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          cargo-registry-cache-
+          cargo-registry-cache-${{ inputs.cache-key }}-
 
     - name: Cache Cargo's registry index
       uses: actions/cache@v3
       with:
         path: ~/.cargo/registry/index
-        key: cargo-registry-index-${{ hashFiles('**/Cargo.lock') }}
+        key: cargo-registry-index-${{ inputs.cache-key }}-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          cargo-registry-index-
+          cargo-registry-index-${{ inputs.cache-key }}-
 
     - name: Cache Cargo's target directory
       uses: actions/cache@v3
       with:
-        path: "${{ inputs.target-dir }}"
-        key: cargo-build-${{ steps.rustc.outputs.version }}-${{ hashFiles('**/Cargo.lock') }}
+        path: "${{ inputs.target-dir }}-${{ inputs.cache-key }}-"
+        key: cargo-build-${{ inputs.cache-key }}-${{ steps.rustc.outputs.version }}-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          cargo-build-${{ steps.rustc.outputs.version }}-
+          cargo-build-${{ inputs.cache-key }}-${{ steps.rustc.outputs.version }}-
