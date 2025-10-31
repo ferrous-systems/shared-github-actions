@@ -60,6 +60,10 @@ runs:
       shell: bash
       run: echo $(rustup toolchain list -v)
 
+    - name: Setting Ferrocene as default
+      shell: bash
+      run: rustup default ferrocene
+
     - name: Output cargo version
       shell: bash
       run: echo $(cargo -V)
