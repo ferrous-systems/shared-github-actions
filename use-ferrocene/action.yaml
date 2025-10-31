@@ -28,32 +28,40 @@ runs:
         rm -rf ~/.rustup
         rm -rf ~/.cargo
 
+    - name: Prepares criticalup manifest
+      shell: bash
+      run: |
+        cat <<- EOF > criticalup.toml
+          manifest-version = 1
+
+          [products.ferrocene]
+          release = "stable-25.08.0"
+          packages = [
+              "cargo-\${rustc-host}",
+              "rustc-\${rustc-host}",
+              "rustfmt-\${rustc-host}",
+              "clippy-\${rustc-host}",
+              "rust-std-\${rustc-host}",
+          ]
+        EOF
+
     - name: Install Ferrocene
       shell: bash
       run: |
         curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
         criticalup auth set ${{ inputs.token }}
         criticalup install
-
+    
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
       shell: bash
       run: |
         criticalup link create
         
-    - name: Add Ferrocene to path
+    - name: Output installed toolchains
       shell: bash
-      run: |
-        ${{ runner.os == 'Linux' && 'echo "Adding to path: $HOME/.local/share/criticalup/proxy/bin"' || '' }}
-        ${{ runner.os == 'Linux' && 'echo "$HOME/.local/share/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
+      run: echo $(rustup toolchain list -v)
 
-        ${{ runner.os == 'Windows' && 'echo "Adding to path: $HOME/AppData/Roaming/criticalup/proxy/bin"' || '' }}
-        ${{ runner.os == 'Windows' && 'echo "$HOME/AppData/Roaming/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
-
-        ${{ runner.os == 'macOS' && 'echo "Adding to path: $HOME/Library/Application Support/criticalup/proxy/bin"' || '' }}
-        ${{ runner.os == 'macOS' && 'echo "$HOME/Library/Application Support/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
-
-    - name: Output $GITHUB_PATH'
+    - name: Output cargo version
       shell: bash
-      run: |
-        echo $PATH
+      run: echo $(cargo -V)
