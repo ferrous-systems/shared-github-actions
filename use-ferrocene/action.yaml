@@ -36,6 +36,7 @@ runs:
         criticalup install
 
     - name: Prepares criticalup manifest
+      shell: bash
       run: |
         cat <<- EOF > criticalup.toml
           manifest-version = 1
