@@ -35,6 +35,20 @@ runs:
         criticalup auth set ${{ inputs.token }}
         criticalup install
 
+    - name: Prepares criticalup manifest
+      run: |
+        cat <<- EOF > criticalup.toml
+          manifest-version = 1
+
+          [products.ferrocene]
+          release = "stable-25.05.0"
+          packages = [
+              "cargo-\${rustc-host}",
+              "rustc-\${rustc-host}",
+              "rust-std-\${rustc-host}",
+          ]
+        EOF
+
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
       shell: bash
@@ -52,6 +66,13 @@ runs:
 
         ${{ runner.os == 'macOS' && 'echo "Adding to path: $HOME/Library/Application Support/criticalup/proxy/bin"' || '' }}
         ${{ runner.os == 'macOS' && 'echo "$HOME/Library/Application Support/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
+
+    - name: Output installed toolchains
+      run: echo $(rustup toolchain list -v)
+
+    - name: Output cargo version
+      run: echo $(cargo -V)
+
 
     - name: Output $GITHUB_PATH'
       shell: bash
