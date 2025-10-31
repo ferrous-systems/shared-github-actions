@@ -49,7 +49,6 @@ runs:
         curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
         criticalup auth set ${{ inputs.token }}
         criticalup install
-
     
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
@@ -57,18 +56,6 @@ runs:
       run: |
         criticalup link create
         
-    # - name: Add Ferrocene to path
-    #   shell: bash
-    #   run: |
-    #     ${{ runner.os == 'Linux' && 'echo "Adding to path: $HOME/.local/share/criticalup/proxy/bin"' || '' }}
-    #     ${{ runner.os == 'Linux' && 'echo "$HOME/.local/share/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
-
-    #     ${{ runner.os == 'Windows' && 'echo "Adding to path: $HOME/AppData/Roaming/criticalup/proxy/bin"' || '' }}
-    #     ${{ runner.os == 'Windows' && 'echo "$HOME/AppData/Roaming/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
-
-    #     ${{ runner.os == 'macOS' && 'echo "Adding to path: $HOME/Library/Application Support/criticalup/proxy/bin"' || '' }}
-    #     ${{ runner.os == 'macOS' && 'echo "$HOME/Library/Application Support/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
-
     - name: Output installed toolchains
       shell: bash
       run: echo $(rustup toolchain list -v)
@@ -76,8 +63,3 @@ runs:
     - name: Output cargo version
       shell: bash
       run: echo $(cargo -V)
-
-    # - name: Output $GITHUB_PATH'
-    #   shell: bash
-    #   run: |
-    #     echo $PATH
