@@ -69,9 +69,11 @@ runs:
         ${{ runner.os == 'macOS' && 'echo "$HOME/Library/Application Support/criticalup/proxy/bin" >> $GITHUB_PATH' || '' }}
 
     - name: Output installed toolchains
+      shell: bash
       run: echo $(rustup toolchain list -v)
 
     - name: Output cargo version
+      shell: bash
       run: echo $(cargo -V)
 
 
