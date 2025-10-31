@@ -56,6 +56,10 @@ runs:
       run: |
         criticalup link create
         
+    - name: Install ferrocene default
+      shell: bash
+      run: criticalup install
+        
     - name: Add Ferrocene to path
       shell: bash
       run: |
