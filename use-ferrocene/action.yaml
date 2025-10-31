@@ -28,13 +28,6 @@ runs:
         rm -rf ~/.rustup
         rm -rf ~/.cargo
 
-    - name: Install Ferrocene
-      shell: bash
-      run: |
-        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
-        criticalup auth set ${{ inputs.token }}
-        criticalup install
-
     - name: Prepares criticalup manifest
       shell: bash
       run: |
@@ -50,6 +43,14 @@ runs:
           ]
         EOF
 
+    - name: Install Ferrocene
+      shell: bash
+      run: |
+        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
+        criticalup auth set ${{ inputs.token }}
+        criticalup install
+
+    
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
       shell: bash
