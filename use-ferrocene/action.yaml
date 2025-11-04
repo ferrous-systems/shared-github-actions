@@ -39,6 +39,7 @@ runs:
           packages = [
               "cargo-\${rustc-host}",
               "rustc-\${rustc-host}",
+              "rustfmt-\${rustc-host}",
               "rust-std-\${rustc-host}",
           ]
         EOF
