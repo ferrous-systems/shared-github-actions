@@ -5,7 +5,9 @@ runs:
   using: composite
   steps:
     - name: install REUSE
+      shell: bash
       run: pipx install reuse
 
     - name: Check compliance
+      shell: bash
       run: reuse lint
