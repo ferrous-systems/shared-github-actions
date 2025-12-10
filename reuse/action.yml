@@ -1,0 +1,11 @@
+name: Reuse
+description: Check licences with reuse
+
+runs:
+  using: composite
+  steps:
+    - name: install REUSE
+      run: pipx install reuse
+
+    - name: Check compliance
+      run: reuse lint
