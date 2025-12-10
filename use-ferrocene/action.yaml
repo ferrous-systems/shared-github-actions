@@ -35,7 +35,7 @@ runs:
           manifest-version = 1
 
           [products.ferrocene]
-          release = "stable-25.08.0"
+          release = "stable-25.11.0"
           packages = [
               "cargo-\${rustc-host}",
               "rustc-\${rustc-host}",
