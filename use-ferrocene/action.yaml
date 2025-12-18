@@ -17,6 +17,11 @@ inputs:
     description: "If a `rustup` toolchain should be configured, allowing, for example `cargo +ferrocene build` (conflicts with `uninstall-rustup: true`)"
     required: false
     default: "true"
+  uninstall-criticalup:
+    description: Some workflow require uninstalling criticalup to avoid conflicts
+    default: false
+    required: false
+
 
 runs:
   using: composite
@@ -65,3 +70,12 @@ runs:
     - name: Output cargo version
       shell: bash
       run: echo $(cargo -V)
+
+    - name: Run cleanup workflow
+      if: ${{ inputs.uninstall-criticalup == true }}
+      shell: bash
+      run: |
+       criticalup remove
+       criticalup clean
+
+  
