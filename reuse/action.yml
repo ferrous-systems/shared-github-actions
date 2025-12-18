@@ -11,3 +11,7 @@ runs:
     - name: Check compliance
       shell: bash
       run: reuse lint
+
+    - name: Source reuse
+      shell: bash
+      run: pipx ensurepath
