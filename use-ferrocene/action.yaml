@@ -4,7 +4,7 @@
 ---
 
 name: "Use Ferrocene"
-description: "Use Ferrocene"
+description: "Installs CriticalUp. Requires a criticalup.toml configuration. Intended for Ferrocene packages installation"
 inputs:
   token:
     description: The CriticalUp token to use (use a GHA Secret)
@@ -28,40 +28,21 @@ runs:
         rm -rf ~/.rustup
         rm -rf ~/.cargo
 
-    - name: Prepares criticalup manifest
-      shell: bash
-      run: |
-        cat <<- EOF > criticalup.toml
-          manifest-version = 1
-
-          [products.ferrocene]
-          release = "stable-25.11.0"
-          packages = [
-              "cargo-\${rustc-host}",
-              "rustc-\${rustc-host}",
-              "rustfmt-\${rustc-host}",
-              "clippy-\${rustc-host}",
-              "rust-std-\${rustc-host}",
-          ]
-        EOF
-
     - name: Install Ferrocene
       shell: bash
       run: |
         curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
         criticalup auth set ${{ inputs.token }}
         criticalup install
-    
+
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
       shell: bash
       run: |
         criticalup link create
-        
+        rustup default ferrocene
+
     - name: Output installed toolchains
+      if: ${{ inputs.uninstall-rustup == 'false' }}
       shell: bash
       run: echo $(rustup toolchain list -v)
-
-    - name: Output cargo version
-      shell: bash
-      run: echo $(cargo -V)
