@@ -28,6 +28,11 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Check for conflicting inputs
+      if: ${{ inputs.uninstall-rustup == 'true' && inputs.toolchain-link == 'true' }}
+      shell: bash
+      run: exit 1
+
     - name: Remove Rust
       if: ${{ inputs.uninstall-rustup == 'true' }}
       shell: bash
