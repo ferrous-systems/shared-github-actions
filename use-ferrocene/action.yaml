@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 
 ---
-
 name: "Use Ferrocene"
 description: "Installs CriticalUp. Requires a criticalup.toml configuration. Intended for Ferrocene packages installation"
 inputs:
@@ -17,6 +16,14 @@ inputs:
     description: "If a `rustup` toolchain should be configured, allowing, for example `cargo +ferrocene build` (conflicts with `uninstall-rustup: true`)"
     required: false
     default: "true"
+  cache-toolchain:
+    description: "If the Ferrocene toolchain should be cached (only available on Linux)"
+    required: false
+    default: "true"
+  remove-auth:
+    description: "If the CriticalUp authentication should be removed after installing the toolchain. This should be `true` if caching is enabled."
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -28,12 +35,30 @@ runs:
         rm -rf ~/.rustup
         rm -rf ~/.cargo
 
-    - name: Install Ferrocene
+    - name: Install criticalup
       shell: bash
       run: |
         curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
+
+    - name: Cache Ferrocene toolchain
+      id: cache-criticalup
+      if: ${{ runner.os == 'Linux' && inputs.cache-criticalup == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: ~/.local/share/criticalup/
+        key: ${{ runner.os }}-criticalup-${{ hashFiles('**/criticalup.toml') }}
+
+    - name: Install Ferrocene toolchain
+      if: ${{ steps.cache-criticalup.outputs.cache-hit != 'true' }}
+      shell: bash
+      run: |
         criticalup auth set ${{ inputs.token }}
         criticalup install
+
+    - name: Remove CriticalUp authentication (to avoid caching it)
+      if: ${{ inputs.remove-auth == 'true' }}
+      shell: bash
+      run: criticalup auth remove
 
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
