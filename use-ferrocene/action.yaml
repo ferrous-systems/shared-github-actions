@@ -17,6 +17,10 @@ inputs:
     description: "If a `rustup` toolchain should be configured, allowing, for example `cargo +ferrocene build` (conflicts with `uninstall-rustup: true`)"
     required: false
     default: "true"
+  cache-toolchain:
+    description: "If the Ferrocene toolchain should be cached"
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -33,12 +37,29 @@ runs:
         rm -rf ~/.rustup
         rm -rf ~/.cargo
 
-    - name: Install Ferrocene
-      shell: bash
-      run: |
-        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
-        criticalup auth set ${{ inputs.token }}
+    - name: Install criticalup
+      run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
+
+    - name: Authenticate criticalup
+      run: criticalup auth set ${{ inputs.token }}
+
+    - name: Install Ferrocene packages from cache
+      if: ${{ inputs.cache-toolchain == 'true' && steps.cache-criticalup.outputs.cache-hit = 'true' }}
+      run:
+        criticalup install --offline
+
+    - name: Install Ferrocene toolchain from download server
+      if: ${{ inputs.cache-toolchain == 'false' || steps.cache-criticalup.outputs.cache-hit = 'false' }}
+      run:
         criticalup install
+
+    - name: Cache Ferrocene toolchain
+      id: cache-criticalup
+      if: ${{ runner.os == 'Linux' && inputs.cache-criticalup == 'true' }}
+      uses: actions/cache@v5
+      with:
+        path: ~/.cache/criticalup
+        key: ${{ runner.os }}-criticalup-${{ hashFiles('**/criticalup.toml') }}
 
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
