@@ -25,14 +25,12 @@ inputs:
 runs:
   using: composite
   steps:
-      - name: Check for conflicting inputs
+    - name: Check for conflicting inputs
       if: ${{ inputs.uninstall-rustup == 'true' && inputs.toolchain-link == 'true' }}
-      shell: bash
       run: exit 1
 
     - name: Remove Rust
       if: ${{ inputs.uninstall-rustup == 'true' }}
-      shell: bash
       run: |
         rm -rf ~/.rustup
         rm -rf ~/.cargo
@@ -63,7 +61,6 @@ runs:
 
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
-      shell: bash
       run: |
         criticalup link create
         rustup default ferrocene
