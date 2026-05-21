@@ -27,27 +27,33 @@ runs:
   steps:
     - name: Check for conflicting inputs
       if: ${{ inputs.uninstall-rustup == 'true' && inputs.toolchain-link == 'true' }}
+      shell: bash
       run: exit 1
 
     - name: Remove Rust
       if: ${{ inputs.uninstall-rustup == 'true' }}
+      shell: bash
       run: |
         rm -rf ~/.rustup
         rm -rf ~/.cargo
 
     - name: Install criticalup
+      shell: bash
       run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
 
     - name: Authenticate criticalup
+      shell: bash
       run: criticalup auth set ${{ inputs.token }}
 
     - name: Install Ferrocene packages from cache
       if: ${{ inputs.cache-toolchain == 'true' && steps.cache-criticalup.outputs.cache-hit = 'true' }}
+      shell: bash
       run:
         criticalup install --offline
 
     - name: Install Ferrocene toolchain from download server
       if: ${{ inputs.cache-toolchain == 'false' || steps.cache-criticalup.outputs.cache-hit = 'false' }}
+      shell: bash
       run:
         criticalup install
 
@@ -61,6 +67,7 @@ runs:
 
     - name: Link `ferrocene` toolchain in `rustup`
       if: ${{ inputs.toolchain-link == 'true' }}
+      shell: bash
       run: |
         criticalup link create
         rustup default ferrocene
