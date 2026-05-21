@@ -17,14 +17,26 @@ inputs:
     description: "If a `rustup` toolchain should be configured, allowing, for example `cargo +ferrocene build` (conflicts with `uninstall-rustup: true`)"
     required: false
     default: "true"
+  cache-toolchain:
+    description: "If the Ferrocene toolchain should be cached"
+    required: false
+    default: "true"
 
 runs:
   using: composite
   steps:
-      - name: Check for conflicting inputs
-      if: ${{ inputs.uninstall-rustup == 'true' && inputs.toolchain-link == 'true' }}
+    - name: Check for conflicting inputs
+      if: inputs.uninstall-rustup == 'true' && inputs.toolchain-link == 'true'
       shell: bash
       run: exit 1
+
+    - name: Cache Ferrocene toolchain
+      uses: actions/cache@v5
+      id: cache-toolchain
+      if: runner.os == 'Linux' && inputs.cache-toolchain == 'true'
+      with:
+        path: ~/.cache/criticalup
+        key: ${{ runner.os }}-criticalup-${{ hashFiles('**/criticalup.toml') }}
 
     - name: Remove Rust
       if: ${{ inputs.uninstall-rustup == 'true' }}
@@ -33,21 +45,34 @@ runs:
         rm -rf ~/.rustup
         rm -rf ~/.cargo
 
-    - name: Install Ferrocene
+    - name: Install criticalup
       shell: bash
-      run: |
-        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
-        criticalup auth set ${{ inputs.token }}
+      run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/ferrocene/criticalup/releases/latest/download/criticalup-installer.sh | sh
+
+    - name: Authenticate criticalup
+      shell: bash
+      run: criticalup auth set ${{ inputs.token }}
+
+    - name: Install Ferrocene packages from cache
+      if:  steps.cache-toolchain.outputs.cache-hit == 'true'
+      shell: bash
+      run:
+        criticalup install --offline
+
+    - name: Install Ferrocene toolchain from download server
+      if:  steps.cache-toolchain.outputs.cache-hit != 'true'
+      shell: bash
+      run:
         criticalup install
 
     - name: Link `ferrocene` toolchain in `rustup`
-      if: ${{ inputs.toolchain-link == 'true' }}
+      if: inputs.toolchain-link == 'true'
       shell: bash
       run: |
         criticalup link create
         rustup default ferrocene
 
     - name: Output installed toolchains
-      if: ${{ inputs.uninstall-rustup == 'false' }}
+      if: inputs.uninstall-rustup == 'false'
       shell: bash
       run: echo $(rustup toolchain list -v)
