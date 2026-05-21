@@ -60,19 +60,19 @@ runs:
     - name: Cache Ferrocene toolchain
       uses: actions/cache@v5
       id: cache-criticalup
-      if: ${{ (runner.os == 'Linux') && (inputs.cache-criticalup == 'true') }}
+      if: inputs.cache-criticalup == 'true'
       with:
         path: ~/.cache/criticalup
         key: ${{ runner.os }}-criticalup-${{ hashFiles('**/criticalup.toml') }}
 
     - name: Link `ferrocene` toolchain in `rustup`
-      if: ${{ inputs.toolchain-link == 'true' }}
+      if: inputs.toolchain-link == 'true'
       shell: bash
       run: |
         criticalup link create
         rustup default ferrocene
 
     - name: Output installed toolchains
-      if: ${{ inputs.uninstall-rustup == 'false' }}
+      if: inputs.uninstall-rustup == 'false'
       shell: bash
       run: echo $(rustup toolchain list -v)
