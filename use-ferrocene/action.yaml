@@ -46,21 +46,21 @@ runs:
       run: criticalup auth set ${{ inputs.token }}
 
     - name: Install Ferrocene packages from cache
-      if: ${{ steps.cache-criticalup.outputs.cache-hit == 'true' }}
+      if:  steps.cache-criticalup.outputs.cache-hit == 'true'
       shell: bash
       run:
         criticalup install --offline
 
     - name: Install Ferrocene toolchain from download server
-      if: ${{ steps.cache-criticalup.outputs.cache-hit != 'true' }}
+      if:  steps.cache-criticalup.outputs.cache-hit != 'true'
       shell: bash
       run:
         criticalup install
 
     - name: Cache Ferrocene toolchain
-      id: cache-criticalup
-      if: ${{ runner.os == 'Linux' && inputs.cache-criticalup == 'true' }}
       uses: actions/cache@v5
+      id: cache-criticalup
+      if: ${{ (runner.os == 'Linux') && (inputs.cache-criticalup == 'true') }}
       with:
         path: ~/.cache/criticalup
         key: ${{ runner.os }}-criticalup-${{ hashFiles('**/criticalup.toml') }}
