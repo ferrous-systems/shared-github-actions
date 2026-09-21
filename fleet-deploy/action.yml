@@ -1,0 +1,38 @@
+name: Deploy using Fleet
+description: Deploy with Fleet to FS infrastructure
+
+inputs:
+  target:
+    required: true
+    description: The deployment environment to push to
+  patch-file:
+    default: fleet/env.yaml
+    description: The path to the kustomization patch to write
+  patch:
+    required: false
+    description: The kustomization patch to write
+
+runs:
+  using: composite
+  steps:
+    - name: Set Git config
+      shell: bash
+      run: |-
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git checkout -B automation/fleet/${{ inputs.target }}
+
+    - name: Write kustomization
+      if: ${{ inputs.patch }} != null
+      shell: bash
+      run: |-
+        cat >${{ inputs.patch-file }} <<-EOF
+        ${{ inputs.patch }}
+        EOF
+        git add ${{ inputs.patch-file }}
+        git commit -m 'Deploy commit ${{ github.sha }}'
+
+    - name: Push the deployment config
+      shell: bash
+      run: |-
+        git push --force origin automation/fleet/${{ inputs.target }}

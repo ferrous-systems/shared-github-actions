@@ -1,0 +1,27 @@
+name: Promote Fleet Deployment
+description: Promote a resource on FS Infrastructure using Fleet
+
+inputs:
+  source:
+    required: true
+    description: The deployment environment to promote from
+  target:
+    required: true
+    description: The deployment environment to promote to
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout the ${{ inputs.source }} environment
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        ref: automation/fleet/${{ inputs.source }}
+        persist-credentials: true
+
+    - name: Push the ${{ inputs.target }} environment
+      shell: bash
+      run: |-
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git checkout -B automation/fleet/${{ inputs.target }}
+        git push --force origin automation/fleet/${{ inputs.target }}

@@ -155,3 +155,25 @@ jobs:
       cname: subdomain.example.com
       cache-target-directory: true
 ```
+
+## Fleet Deploy
+
+Deploys a repository using our internal Fleet common structure. See [Outline](https://outline.ferrous-systems.com/doc/fleet-gbSmTkCDMX) for more information.
+
+```yaml
+steps:
+  - uses: ferrous-systems/shared-github-actions/fleet-deploy@main
+    with:
+      target: production
+      patch: |-
+        apiVersion: v1
+        kind: Deployment
+        metadata:
+          name: my-deployment
+        spec:
+          template:
+            spec:
+              containers:
+                - name: my-container
+                  image: harbor.infra.ferrous-systems.net/foo/bar:${{ github.sha }}
+```
