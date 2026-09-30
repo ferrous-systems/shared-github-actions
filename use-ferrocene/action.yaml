@@ -36,7 +36,7 @@ runs:
       if: runner.os == 'Linux' && inputs.cache-toolchain == 'true'
       with:
         path: ~/.cache/criticalup
-        key: ${{ runner.os }}-criticalup-${{ hashFiles('**/criticalup.toml') }}
+        key: ${{ runner.os }}-${{ runner.arch }}-criticalup-${{ hashFiles('**/criticalup.toml') }}
 
     - name: Remove Rust
       if: ${{ inputs.uninstall-rustup == 'true' }}
